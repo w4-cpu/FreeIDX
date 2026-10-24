@@ -2,6 +2,17 @@ name = "freeidx-api"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
 
+# 合并部署：前端 SPA 产物作为本 Worker 的静态资源一起上线（apps/web 的 Vite outDir）
+[assets]
+directory = "../web/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+# 除静态资源目录外的请求一律先进 Worker：/api、/files、爬虫预渲染 HTML、.htm 旧链 301、robots/sitemap。
+# 不列进这里的路径会由静态资源直接应答，Worker 不运行 → 预渲染与 301 失效。
+# /assets/*（构建产物）与 /emoicon /avatars /theme-light /fonts（public/ 根级纯静态资源）
+# 全部走否定模式交回静态资源层：CF 对静态资源请求免费且不计 Worker 请求额度，
+# 否则每张头像/表情/背景/字体都会消耗 1 次 Worker 请求，并白白触发中间件链路（含 2 次 KV 读）。
+run_worker_first = ["/*", "!/assets/*", "!/emoicon/*", "!/avatars/*", "!/theme-light/*", "!/fonts/*"]
 
 [[d1_databases]]
 binding = "DB"

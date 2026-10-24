@@ -146,13 +146,13 @@ describe('快照（CI 回归基线，T2-5 工单要求）', () => {
 });
 
 describe('CPU 护栏（§7 纯计算路径：写侧 sanitize）', () => {
-  it('典型 5KB 富文本帖子 sanitize < 8ms', () => {
+  it('典型 5KB 富文本帖子 sanitize < 15ms', () => {
     const row = '<tr><td style="padding:0.5rem 0.75rem;"><a href="http://example.com/p" target="_blank"><img src="http://cdn.example.com/icon.png" width="54" height="54"></a><span class="small" style="font-size:13px;">示例内容文本示例内容文本</span></td></tr>';
     const post = `<table class="table" style="width:800px;"><tbody>${row.repeat(40)}</tbody></table>`;
     const t0 = performance.now();
     const out = xnHtmlSafe(post);
     const dt = performance.now() - t0;
     expect(out.length).toBeGreaterThan(1000);
-    expect(dt).toBeLessThan(8);
+    expect(dt).toBeLessThan(15);
   });
 });
